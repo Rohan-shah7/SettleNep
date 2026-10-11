@@ -1,10 +1,24 @@
 use anchor_lang::prelude::*;
 
 #[constant]
-pub const COUNTER_SEED: &[u8] = b"counter";
+pub const SETTLEMENT_SEED: &[u8] = b"settlement";
+
+pub const MAX_ALLOCATIONS: usize = 8;
 
 #[constant]
-pub const HELLO_WORLD_LAMPORTS: u64 = 1;
+pub const INITIALIZED: u8 = 0;
+#[constant]
+pub const SETTLED: u8 = 1;
+#[constant]
+pub const CANCELLED: u8 = 2;
 
 #[constant]
-pub const MAX_COUNT: u64 = 10;
+pub const PURPOSE_FAMILY: u8 = 0;
+#[constant]
+pub const PURPOSE_EDUCATION: u8 = 1;
+#[constant]
+pub const PURPOSE_SAVINGS: u8 = 2;
+#[constant]
+pub const PURPOSE_EMERGENCY: u8 = 3;
+#[constant]
+pub const PURPOSE_OTHER: u8 = 4;

@@ -250,14 +250,14 @@ Treat a transaction signature, account data, and transaction confirmation as dis
 
 ### Phase 3 — Smart Contract
 
-- [ ] Define transfer account structures.
-- [ ] Define allocation validation.
-- [ ] Implement required Anchor instructions.
-- [ ] Implement the selected asset-transfer mechanism.
-- [ ] Add authorization and account validation.
-- [ ] Add custom errors.
-- [ ] Test success and failure cases.
-- [ ] Build and verify the program.
+- [x] Define transfer account structures.
+- [x] Define allocation validation.
+- [x] Implement required Anchor instructions.
+- [x] Implement the selected asset-transfer mechanism.
+- [x] Add authorization and account validation.
+- [x] Add custom errors.
+- [x] Test success and failure cases.
+- [x] Build and verify the program.
 
 ### Phase 4 — Frontend Integration
 

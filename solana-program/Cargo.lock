@@ -2322,6 +2322,18 @@ dependencies = [
 ]
 
 [[package]]
+name = "settlenep"
+version = "0.1.0"
+dependencies = [
+ "anchor-lang",
+ "litesvm",
+ "solana-keypair",
+ "solana-message",
+ "solana-signer",
+ "solana-transaction",
+]
+
+[[package]]
 name = "sha2"
 version = "0.9.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3118,18 +3130,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "cafcd950de74c6c39d55dc8ca108bbb007799842ab370ef26cf45a34453c31e1"
 dependencies = [
  "num-traits",
-]
-
-[[package]]
-name = "solana-program"
-version = "0.1.0"
-dependencies = [
- "anchor-lang",
- "litesvm",
- "solana-keypair",
- "solana-message",
- "solana-signer",
- "solana-transaction",
 ]
 
 [[package]]
