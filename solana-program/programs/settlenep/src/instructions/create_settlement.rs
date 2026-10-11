@@ -12,7 +12,7 @@ pub struct CreateSettlement<'info> {
     #[account(mut)]
     pub recipient: UncheckedAccount<'info>,
     #[account(
-        init,
+        init_if_needed,
         payer = sender,
         space = 8 + Settlement::INIT_SPACE,
         seeds = [SETTLEMENT_SEED, sender.key().as_ref(), nonce.to_le_bytes().as_ref()],
@@ -53,8 +53,15 @@ pub fn handle_create_settlement(
     }
     require!(allocated == amount, ErrorCode::AllocationMismatch);
 
-    let clock = Clock::get()?;
+    // Re-initialization guard: with `init_if_needed` a repeated attempt with
+    // the same sender and nonce must be surfaced as the semantic error.
     let settlement = &mut ctx.accounts.settlement;
+    require!(
+        settlement.created_at == 0,
+        ErrorCode::DuplicateSettlement,
+    );
+
+    let clock = Clock::get()?;
     settlement.sender = sender;
     settlement.recipient = recipient;
     settlement.amount = amount;

@@ -177,6 +177,59 @@ fn test_duplicate_nonce_rejected() {
 }
 
 #[test]
+fn test_same_nonce_allowed_for_different_senders() {
+    let program_id = settlenep::id();
+    let mut svm = svm();
+    let sender_a = Keypair::new();
+    let sender_b = Keypair::new();
+    let recipient = Keypair::new();
+    svm.airdrop(&sender_a.pubkey(), AIRDROP).unwrap();
+    svm.airdrop(&sender_b.pubkey(), AIRDROP).unwrap();
+    svm.airdrop(&recipient.pubkey(), AIRDROP).unwrap();
+
+    let nonce = 42u64;
+    let amount = 300_000u64;
+    let allocations = vec![Allocation {
+        purpose: PURPOSE_FAMILY,
+        amount,
+    }];
+    let settlement_a = settlement_address(&program_id, &sender_a.pubkey(), nonce);
+    let settlement_b = settlement_address(&program_id, &sender_b.pubkey(), nonce);
+    assert_ne!(settlement_a, settlement_b);
+
+    let ix_a = create_ix(
+        &program_id,
+        &sender_a.pubkey(),
+        &recipient.pubkey(),
+        &settlement_a,
+        amount,
+        [0u8; 32],
+        allocations.clone(),
+        nonce,
+    );
+    let ix_b = create_ix(
+        &program_id,
+        &sender_b.pubkey(),
+        &recipient.pubkey(),
+        &settlement_b,
+        amount,
+        [0u8; 32],
+        allocations,
+        nonce,
+    );
+
+    assert!(send(&mut svm, &sender_a, ix_a).is_ok());
+    assert!(send(&mut svm, &sender_b, ix_b).is_ok());
+
+    let settlement_a_data = read_settlement(&svm, &settlement_a);
+    let settlement_b_data = read_settlement(&svm, &settlement_b);
+    assert_eq!(settlement_a_data.sender, sender_a.pubkey());
+    assert_eq!(settlement_b_data.sender, sender_b.pubkey());
+    assert_eq!(settlement_a_data.nonce, nonce);
+    assert_eq!(settlement_b_data.nonce, nonce);
+}
+
+#[test]
 fn test_zero_amount_rejected() {
     let program_id = settlenep::id();
     let mut svm = svm();

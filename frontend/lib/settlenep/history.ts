@@ -16,6 +16,10 @@ export type SettlementRecord = {
   confirmationStatus: string | null;
 };
 
+// The history and verification flows only need the RPC and program plugins,
+// so they accept any client carrying them (no wallet plugin required).
+export type HistoryClient = Pick<AppClient, "rpc" | "settlenep">;
+
 // Settlement layout: 8-byte discriminator, then `sender: Pubkey`, so the
 // sender field starts at byte offset 8.
 const SENDER_MEMCMP_OFFSET = 8n;
@@ -25,7 +29,7 @@ const settlementDecoder = getSettlementDecoder();
 const base64Encoder = getBase64Encoder();
 
 async function attachSignature(
-  client: AppClient,
+  client: HistoryClient,
   record: SettlementRecord,
 ): Promise<void> {
   try {
@@ -45,7 +49,7 @@ async function attachSignature(
 // Reads every settlement whose `sender` field equals the given address. Uses a
 // `getProgramAccounts` memcmp filter on the sender field — no backend index.
 export async function fetchSettlementsBySender(
-  client: AppClient,
+  client: HistoryClient,
   sender: string,
 ): Promise<SettlementRecord[]> {
   const accounts = await client.rpc
@@ -85,7 +89,7 @@ export async function fetchSettlementsBySender(
 // Fetches a single settlement by its account address (used by the recipient
 // verification flow). Returns null when the account does not exist.
 export async function fetchSettlementByAddress(
-  client: AppClient,
+  client: HistoryClient,
   settlementAddress: Address,
 ): Promise<SettlementRecord | null> {
   const maybe = await client.settlenep.accounts.settlement.fetchMaybe(

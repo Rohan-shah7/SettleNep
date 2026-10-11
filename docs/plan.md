@@ -150,10 +150,10 @@ Wait for approval.
 ## Phase 6 — Integration Testing
 
 ### Tasks
-- [ ] Program: failure tests already in Phase 3; add any gaps (unauthorized, invalid status transitions if state grows).
-- [ ] Frontend: invalid address, zero/negative amounts, invalid allocation totals, duplicate all-nonce collision UX, wallet rejection, RPC failure paths, confirmation mismatch.
-- [ ] Run full gates: `NO_DNA=1 anchor test`, `npm run lint`, `npm run typecheck`, `npm run build`.
-- [ ] Optionally add a Surfpool/Knowns embedded integration test for the retryability (sequential duplicate attempts) and cross-sender scenarios.
+- [x] Program failure tests: unchanged from Phase 3, plus `test_same_nonce_allowed_for_different_senders` (cross-sender, nonce scoping). Unauthorized/status-transition cases do not apply — the program has no privileged instructions and a single status. Also fixed a real gap found during integration: `init` meant Anchor's machinery (not `DuplicateSettlement`) rejected repeats, so the account constraint moved to `init_if_needed` with an explicit `created_at == 0` re-init guard so the semantic error actually fires.
+- [x] Frontend: Vitest suite added (`npm test`, 52 tests) covering invalid address, zero/negative/large-decimal amounts, invalid allocation totals, wallet rejection and RPC-failure classification; `frontend/scripts/e2e-errors.ts` verifies the duplicate-nonce collision UX and an unreachable-RPC failure against a live validator; confirmation path covered by `e2e-create.ts` (`confirmed`).
+- [x] Full gates: `NO_DNA=1 anchor test` (11), `npm run lint`, `npm run typecheck`, `npm run build`, `npm test`.
+- [x] Optional Surfpool/Knowns embedded test: skipped — LiteSVM already covers sequential duplicate attempts and cross-sender scenarios; no Surfpool fixture was set up.
 
 ### Approval checkpoint
 Wait for approval.

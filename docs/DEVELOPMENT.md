@@ -278,16 +278,16 @@ Treat a transaction signature, account data, and transaction confirmation as dis
 
 ### Phase 6 — Integration Testing
 
-- [ ] Test invalid wallet addresses.
-- [ ] Test zero and invalid amounts.
-- [ ] Test invalid allocation totals.
-- [ ] Test unauthorized instructions.
-- [ ] Test duplicate-processing scenarios.
-- [ ] Test wallet rejection.
-- [ ] Test RPC failures.
-- [ ] Test transaction confirmation.
-- [ ] Run Anchor tests.
-- [ ] Run frontend linting, type checks, and production build where configured.
+- [x] Test invalid wallet addresses. (Vitest `tests/validation.test.ts`; program rejects with `InvalidRecipient`)
+- [x] Test zero and invalid amounts. (Vitest parsing/large-decimal cases; program `InvalidAmount`, `MathOverflow`)
+- [x] Test invalid allocation totals. (Vitest mismatch/no-allocations/>8 cases; program `AllocationMismatch`/`TooManyAllocations`)
+- [x] Test unauthorized instructions. N/A by design — no privileged/admin instructions; sender authorizes every settlement as `Signer`. Added `test_same_nonce_allowed_for_different_senders` (nonce scoping) instead.
+- [x] Test duplicate-processing scenarios. Program re-initialization guard now emits `DuplicateSettlement` (init → `init_if_needed`); `frontend/scripts/e2e-errors.ts` verifies the friendly message at runtime; existing Rust duplicate test green.
+- [x] Test wallet rejection. (Vitest `tests/send-errors.test.ts` classification)
+- [x] Test RPC failures. (`e2e-errors.ts` dead-endpoint check; Vitest classification includes fetch/connection/bad-port variants)
+- [x] Test transaction confirmation. (`e2e-create.ts` asserts `confirmed` status; `waitForConfirmation` handles failed/timeout paths)
+- [x] Run Anchor tests. (`NO_DNA=1 anchor test` — 11 passed incl. cross-sender)
+- [x] Run frontend linting, type checks, and production build where configured. (lint/typecheck/build clean; `npm test` — 52 passed)
 
 ### Phase 7 — Hackathon Demo
 

@@ -8,31 +8,22 @@ import { useEffect, useMemo, useState } from "react";
 import type { AppClient } from "@/app/providers";
 import { formatSol, parseSolInput } from "@/lib/lamports";
 import { CLUSTER, explorerAddressUrl, explorerTxUrl } from "@/lib/solana";
-import {
-  isSettlenepError,
-  type SettlenepError,
-  SETTLENEP_ERROR__ALLOCATION_MISMATCH,
-  SETTLENEP_ERROR__DUPLICATE_SETTLEMENT,
-  SETTLENEP_ERROR__INVALID_AMOUNT,
-  SETTLENEP_ERROR__INVALID_RECIPIENT,
-  SETTLENEP_ERROR__MATH_OVERFLOW,
-  SETTLENEP_ERROR__NO_ALLOCATIONS,
-  SETTLENEP_ERROR__TOO_MANY_ALLOCATIONS,
-} from "@/lib/settlenep/generated/errors";
 import { getCreateSettlementInstructionAsync } from "@/lib/settlenep/generated/instructions";
 import { findSettlementPda } from "@/lib/settlenep/generated/pdas";
-import { SETTLENEP_PROGRAM_ADDRESS } from "@/lib/settlenep/generated/programs";
+import { describeSendError } from "@/lib/settlenep/send-errors";
 import {
   decodeReference,
-  encodeReference,
   MAX_ALLOCATIONS,
   PURPOSES,
   PURPOSE_LABELS,
 } from "@/lib/settlenep/utils";
+import {
+  type AllocationRow,
+  type FormValidation,
+  validateForm,
+} from "@/lib/settlenep/validation";
 
 type Phase = "form" | "review" | "result";
-
-type AllocationRow = { key: number; purpose: number; amount: string };
 
 type SendArgs = {
   sender: string;
@@ -51,129 +42,8 @@ type SendResult = {
   reference: Uint8Array;
 };
 
-type FormValidation = {
-  valid: boolean;
-  amountLamports: bigint;
-  reference: Uint8Array | null;
-  allocations: Array<{ purpose: number; amount: bigint }>;
-  errors: Record<string, string>;
-};
-
-const PROGRAM_ERROR_MESSAGES: ReadonlyArray<[SettlenepError, string]> = [
-  [
-    SETTLENEP_ERROR__INVALID_RECIPIENT,
-    "The recipient address is not valid for settlement.",
-  ],
-  [SETTLENEP_ERROR__INVALID_AMOUNT, "The transfer amount must be greater than zero."],
-  [SETTLENEP_ERROR__NO_ALLOCATIONS, "At least one allocation is required."],
-  [
-    SETTLENEP_ERROR__TOO_MANY_ALLOCATIONS,
-    "The program allows at most 8 allocations.",
-  ],
-  [
-    SETTLENEP_ERROR__ALLOCATION_MISMATCH,
-    "Allocation amounts must sum to the full transfer amount.",
-  ],
-  [
-    SETTLENEP_ERROR__DUPLICATE_SETTLEMENT,
-    "A settlement with this sender and nonce already exists. Change the nonce or wait a moment and retry.",
-  ],
-  [
-    SETTLENEP_ERROR__MATH_OVERFLOW,
-    "An amount overflowed on-chain. Reduce the values and try again.",
-  ],
-];
-
 function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
-}
-
-function describeSendError(error: unknown): string {
-  const transactionMessage = {
-    instructions: { 0: { programAddress: SETTLENEP_PROGRAM_ADDRESS } },
-  };
-  for (const [code, message] of PROGRAM_ERROR_MESSAGES) {
-    if (isSettlenepError(error, transactionMessage, code)) {
-      return message;
-    }
-  }
-  const message =
-    (error as { message?: string } | null)?.message ??
-    String(error);
-  if (/(rejected|declined|denied|cancell?ed)/i.test(message)) {
-    return "The signature request was rejected in your wallet. Nothing was sent.";
-  }
-  if (/insufficient funds|0-0x1|not enough/i.test(message)) {
-    return "Your wallet does not have enough SOL to cover the transfer and fees.";
-  }
-  return message;
-}
-
-function validateForm(
-  recipient: string,
-  amountInput: string,
-  referenceInput: string,
-  rows: AllocationRow[],
-): FormValidation {
-  const errors: Record<string, string> = {};
-  let amountLamports = 0n;
-  let reference: Uint8Array | null = null;
-  const allocations: Array<{ purpose: number; amount: bigint }> = [];
-
-  try {
-    address(recipient);
-  } catch {
-    errors.recipient = "Enter a valid Solana address.";
-  }
-
-  const parsedAmount = parseSolInput(amountInput);
-  if (parsedAmount == null) {
-    errors.amount = "Enter a valid SOL amount with up to 9 decimal places.";
-  } else if (parsedAmount <= 0n) {
-    errors.amount = "The amount must be greater than zero.";
-  } else {
-    amountLamports = parsedAmount;
-  }
-
-  if (referenceInput.trim() !== "") {
-    const encoded = encodeReference(referenceInput);
-    if (encoded == null) {
-      errors.reference = "Keep the reference to 32 ASCII characters or fewer.";
-    } else {
-      reference = encoded;
-    }
-  }
-
-  let allocationTotal = 0n;
-  for (const row of rows) {
-    const rowAmount = parseSolInput(row.amount);
-    if (rowAmount == null || rowAmount <= 0n) {
-      errors.allocations =
-        "Every allocation needs a valid amount greater than zero.";
-      break;
-    }
-    allocations.push({ purpose: row.purpose, amount: rowAmount });
-    allocationTotal += rowAmount;
-  }
-
-  if (rows.length === 0) {
-    errors.allocations = "Add at least one allocation.";
-  }
-  if (rows.length > MAX_ALLOCATIONS) {
-    errors.allocations = `The program allows at most ${MAX_ALLOCATIONS} allocations.`;
-  }
-  if (errors.allocations === undefined && allocationTotal !== amountLamports) {
-    errors.allocations =
-      "Allocations must sum to the exact transfer amount.";
-  }
-
-  return {
-    valid: Object.keys(errors).length === 0,
-    amountLamports,
-    reference,
-    allocations,
-    errors,
-  };
 }
 
 async function waitForConfirmation(

@@ -1,13 +1,7 @@
 import {
-  appendTransactionMessageInstruction,
   createClient,
   createKeyPairSignerFromBytes,
-  createTransactionMessage,
   generateKeyPairSigner,
-  getBase64EncodedWireTransaction,
-  setTransactionMessageFeePayerSigner,
-  setTransactionMessageLifetimeUsingBlockhash,
-  signTransactionMessageWithSigners,
 } from "@solana/kit";
 import { solanaRpc } from "@solana/kit-plugin-rpc";
 import { readFile } from "node:fs/promises";
@@ -31,12 +25,15 @@ async function main(): Promise<void> {
   const keypairBytes = JSON.parse(
     await readFile(`${process.env.HOME}/.config/solana/id.json`, "utf8"),
   ) as number[];
+  if (keypairBytes.length !== 64) {
+    throw new Error("Expected a 64-byte keypair file");
+  }
   const sender = await createKeyPairSignerFromBytes(
     Uint8Array.from(keypairBytes),
   );
   const recipient = await generateKeyPairSigner();
 
-  const client = createClient()
+  const client = createClient({ payer: sender })
     .use(solanaRpc({ rpcUrl: RPC_URL, transactionConfig: { version: 0 } }))
     .use(settlenepProgram());
 
@@ -50,23 +47,9 @@ async function main(): Promise<void> {
     reference,
     allocations: ALLOCATIONS,
   });
-  const { value: blockhash } = await client.rpc.getLatestBlockhash().send();
-  let message = createTransactionMessage({ version: 0 });
-  message = setTransactionMessageFeePayerSigner(sender, message);
-  message = setTransactionMessageLifetimeUsingBlockhash(
-    {
-      blockhash: blockhash.blockhash,
-      lastValidBlockHeight: blockhash.lastValidBlockHeight,
-    },
-    message,
-  );
-  message = appendTransactionMessageInstruction(instruction, message);
-  const signed = await signTransactionMessageWithSigners(message);
-  const signature = await client.rpc
-    .sendTransaction(getBase64EncodedWireTransaction(signed), {
-      encoding: "base64",
-    })
-    .send();
+
+  const { context } = await client.sendTransaction([instruction]);
+  const signature = context.signature;
   console.log(`created settlement tx: ${signature}`);
 
   await new Promise((resolve) => setTimeout(resolve, 1500));
