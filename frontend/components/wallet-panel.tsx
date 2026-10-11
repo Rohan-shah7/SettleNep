@@ -6,18 +6,8 @@ import { useClient, useRequest } from "@solana/react";
 import { useCallback } from "react";
 
 import type { AppClient } from "@/app/providers";
+import { formatSol } from "@/lib/lamports";
 import { CLUSTER, explorerAddressUrl } from "@/lib/solana";
-
-function formatSol(lamports: bigint): string {
-  const negative = lamports < 0n;
-  const absolute = negative ? -lamports : lamports;
-  const whole = absolute / 1_000_000_000n;
-  const fraction = (absolute % 1_000_000_000n)
-    .toString()
-    .padStart(9, "0")
-    .slice(0, 5);
-  return `${negative ? "-" : ""}${whole}.${fraction} SOL`;
-}
 
 export function WalletPanel() {
   const client = useClient<AppClient>();
@@ -103,10 +93,10 @@ export function WalletPanel() {
         </button>
       ) : null}
 
-      {!connected?.supportedTransactionVersions.has(1) ? (
+      {!connected?.supportedTransactionVersions.has(0) ? (
         <p className="mt-6 rounded-xl border border-amber-500/30 bg-amber-500/10 px-3 py-2 text-xs text-amber-700 dark:text-amber-400">
-          This wallet does not advertise transaction v1 support. Some actions may
-          be unavailable until the wallet is updated.
+          This wallet does not advertise versioned transaction support. Update
+          the wallet to continue.
         </p>
       ) : null}
     </div>

@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 import { WalletPanel } from "@/components/wallet-panel";
 import { PROGRAM_ID } from "@/lib/solana";
 
@@ -38,6 +40,26 @@ export default function Home() {
           expenses, education, savings, and emergencies, and associate them with
           verifiable on-chain settlement records.
         </p>
+      </section>
+
+      <section className="mt-12">
+        <div className="flex flex-col items-start justify-between gap-4 rounded-3xl border border-black/[.08] bg-white p-8 sm:flex-row sm:items-center dark:border-white/[.145] dark:bg-zinc-950">
+          <div>
+            <h2 className="text-xl font-semibold text-zinc-900 dark:text-zinc-50">
+              Ready to send?
+            </h2>
+            <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
+              Create a remittance with an allocation plan and settle it in one
+              transaction on Devnet.
+            </p>
+          </div>
+          <Link
+            href="/send"
+            className="shrink-0 rounded-full bg-foreground px-6 py-2.5 text-sm font-medium text-background transition-opacity hover:opacity-90"
+          >
+            Create a remittance
+          </Link>
+        </div>
       </section>
 
       <section className="mt-12 grid gap-6 md:grid-cols-2">

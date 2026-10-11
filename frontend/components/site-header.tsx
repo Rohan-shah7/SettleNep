@@ -16,7 +16,15 @@ export function SiteHeader() {
           </Link>
           <NetworkBadge />
         </div>
-        <WalletConnectButton />
+        <nav className="flex items-center gap-4">
+          <Link
+            href="/send"
+            className="text-sm font-medium text-zinc-600 transition-colors hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-50"
+          >
+            Send
+          </Link>
+          <WalletConnectButton />
+        </nav>
       </div>
     </header>
   );

@@ -109,18 +109,20 @@ Show results (IDL summary, passing/failing tests) and wait for approval before P
 Build the remittance creation flow against the deployed-by-test program ID locally.
 
 ### Tasks
-- [ ] Generate/place the program client (`target/types/*.ts` from the built IDL) in the frontend and wire it into the existing Kit `AppClient` in `frontend/app/providers.tsx`.
-- [ ] Build the remittance form page: recipient address, amount, allocation category editor (up to 8 allocations, purpose + amount), optional reference (`[u8; 32]` encode + decode).
-- [ ] Client-side validation mirroring on-chain rules before submit (recipient valid, amount > 0, allocation count in range, sum == amount, no duplicates).
-- [ ] Transaction review step showing the exact settlement being created (sender, recipient, amount, allocations) before wallet signature.
-- [ ] Pick the nonce deterministically and safely; derive the PDA on the client and show the expected settlement account.
-- [ ] Submit via Wallet Standard (`@solana/kit-plugin-wallet`), versioned transaction v1.
-- [ ] Handle loading, wallet rejection, and error states; never claim success from a signature alone.
-- [ ] Verify on-chain state after confirmation (read back the Settlement account via Kit).
+- [x] Generate/place the program client (`target/types/*.ts` from the built IDL) in the frontend and wire it into the existing Kit `AppClient` in `frontend/app/providers.tsx`.
+- [x] Build the remittance form page: recipient address, amount, allocation category editor (up to 8 allocations, purpose + amount), optional reference (`[u8; 32]` encode + decode).
+- [x] Client-side validation mirroring on-chain rules before submit (recipient valid, amount > 0, allocation count in range, sum == amount, no duplicates).
+- [x] Transaction review step showing the exact settlement being created (sender, recipient, amount, allocations) before wallet signature.
+- [x] Pick the nonce deterministically and safely; derive the PDA on the client and show the expected settlement account.
+- [x] Submit via Wallet Standard (`@solana/kit-plugin-wallet`), versioned transaction v1.
+- [x] Handle loading, wallet rejection, and error states; never claim success from a signature alone.
+- [x] Verify on-chain state after confirmation (read back the Settlement account via Kit).
 
 ### Verify
-- `npm run typecheck`, `npm run lint`, `npm run build`.
-- Dev-server smoke test against a local LiteSVM/validator with a funded keypair (Surfpool or `solana-test-validator` if Surfpool proves problematic) — end-to-end create flow.
+- [x] `npm run typecheck`, `npm run lint`, `npm run build`.
+- [x] End-to-end create flow against a local validator with a funded keypair (deployed `settlenep.so` + generated Kit client): create instruction → confirm → read back `Settlement` → recipient balance. PASS (`frontend/scripts/e2e-create.ts`).
+
+> **Decision (transaction version):** `solana-test-validator` (agave 3.1.10) fails to deserialize the `@solana/kit` transaction **v1** wire format (`failed to fill whole buffer` during simulation); the identical flow passes with `version: 0`. Devnet runs the same 3.x software, so the frontend now plans **version 0** transactions (`providers.tsx`), and the wallet gates check `supportedTransactionVersions.has(0)`. Revisit v1 once network support lands.
 
 ### Approval checkpoint
 Show a successful create flow result and wait for approval.

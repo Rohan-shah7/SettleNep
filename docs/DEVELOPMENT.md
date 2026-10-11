@@ -261,12 +261,12 @@ Treat a transaction signature, account data, and transaction confirmation as dis
 
 ### Phase 4 — Frontend Integration
 
-- [ ] Build the remittance form.
-- [ ] Build allocation inputs and validation.
-- [ ] Implement transaction review.
-- [ ] Connect the frontend to the Anchor program.
-- [ ] Submit wallet-authorized transactions.
-- [ ] Verify confirmed transaction results.
+- [x] Build the remittance form.
+- [x] Build allocation inputs and validation.
+- [x] Implement transaction review.
+- [x] Connect the frontend to the Anchor program.
+- [x] Submit wallet-authorized transactions.
+- [x] Verify confirmed transaction results.
 
 ### Phase 5 — History and Verification
 

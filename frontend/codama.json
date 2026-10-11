@@ -1,0 +1,16 @@
+{
+  "idl": "lib/settlenep/idl/settlenep.json",
+  "scripts": {
+    "js": {
+      "from": "@codama/renderers-js",
+      "args": [
+        "lib/settlenep",
+        {
+          "generatedFolder": "generated",
+          "kitImportStrategy": "rootOnly",
+          "syncPackageJson": false
+        }
+      ]
+    }
+  }
+}

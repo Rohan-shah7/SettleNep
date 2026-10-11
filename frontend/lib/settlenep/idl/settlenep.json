@@ -1,0 +1,283 @@
+{
+  "address": "GFqpc53KGyUi1BGraoZxVCczM6iUCkRQdB8HfnBiH9RZ",
+  "metadata": {
+    "name": "settlenep",
+    "version": "0.1.0",
+    "spec": "0.1.0",
+    "description": "SettleNep programmable remittance settlement"
+  },
+  "instructions": [
+    {
+      "name": "create_settlement",
+      "discriminator": [
+        109,
+        119,
+        255,
+        55,
+        76,
+        73,
+        106,
+        126
+      ],
+      "accounts": [
+        {
+          "name": "sender",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "recipient",
+          "writable": true
+        },
+        {
+          "name": "settlement",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  115,
+                  101,
+                  116,
+                  116,
+                  108,
+                  101,
+                  109,
+                  101,
+                  110,
+                  116
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "sender"
+              },
+              {
+                "kind": "arg",
+                "path": "nonce"
+              }
+            ]
+          }
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "nonce",
+          "type": "u64"
+        },
+        {
+          "name": "amount",
+          "type": "u64"
+        },
+        {
+          "name": "reference",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        },
+        {
+          "name": "allocations",
+          "type": {
+            "vec": {
+              "defined": {
+                "name": "Allocation"
+              }
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "accounts": [
+    {
+      "name": "Settlement",
+      "discriminator": [
+        55,
+        11,
+        219,
+        33,
+        36,
+        136,
+        40,
+        182
+      ]
+    }
+  ],
+  "errors": [
+    {
+      "code": 6000,
+      "name": "InvalidRecipient",
+      "msg": "Recipient address is not valid for settlement"
+    },
+    {
+      "code": 6001,
+      "name": "InvalidAmount",
+      "msg": "Transfer amount must be greater than zero"
+    },
+    {
+      "code": 6002,
+      "name": "NoAllocations",
+      "msg": "At least one allocation is required"
+    },
+    {
+      "code": 6003,
+      "name": "TooManyAllocations",
+      "msg": "Too many allocations"
+    },
+    {
+      "code": 6004,
+      "name": "AllocationMismatch",
+      "msg": "Allocation amounts must sum to the full transfer amount"
+    },
+    {
+      "code": 6005,
+      "name": "DuplicateSettlement",
+      "msg": "A settlement with this sender and nonce already exists"
+    },
+    {
+      "code": 6006,
+      "name": "Unauthorized",
+      "msg": "Only the sender can authorize this settlement"
+    },
+    {
+      "code": 6007,
+      "name": "MathOverflow",
+      "msg": "Integer overflow while processing amounts"
+    }
+  ],
+  "types": [
+    {
+      "name": "Allocation",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "purpose",
+            "type": "u8"
+          },
+          {
+            "name": "amount",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Settlement",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "sender",
+            "type": "pubkey"
+          },
+          {
+            "name": "recipient",
+            "type": "pubkey"
+          },
+          {
+            "name": "amount",
+            "type": "u64"
+          },
+          {
+            "name": "reference",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "allocations",
+            "type": {
+              "array": [
+                {
+                  "defined": {
+                    "name": "Allocation"
+                  }
+                },
+                8
+              ]
+            }
+          },
+          {
+            "name": "allocation_count",
+            "type": "u8"
+          },
+          {
+            "name": "created_at",
+            "type": "i64"
+          },
+          {
+            "name": "status",
+            "type": "u8"
+          },
+          {
+            "name": "nonce",
+            "type": "u64"
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          }
+        ]
+      }
+    }
+  ],
+  "constants": [
+    {
+      "name": "CANCELLED",
+      "type": "u8",
+      "value": "2"
+    },
+    {
+      "name": "INITIALIZED",
+      "type": "u8",
+      "value": "0"
+    },
+    {
+      "name": "PURPOSE_EDUCATION",
+      "type": "u8",
+      "value": "1"
+    },
+    {
+      "name": "PURPOSE_EMERGENCY",
+      "type": "u8",
+      "value": "3"
+    },
+    {
+      "name": "PURPOSE_FAMILY",
+      "type": "u8",
+      "value": "0"
+    },
+    {
+      "name": "PURPOSE_OTHER",
+      "type": "u8",
+      "value": "4"
+    },
+    {
+      "name": "PURPOSE_SAVINGS",
+      "type": "u8",
+      "value": "2"
+    },
+    {
+      "name": "SETTLED",
+      "type": "u8",
+      "value": "1"
+    },
+    {
+      "name": "SETTLEMENT_SEED",
+      "type": "bytes",
+      "value": "[115, 101, 116, 116, 108, 101, 109, 101, 110, 116]"
+    }
+  ]
+}
