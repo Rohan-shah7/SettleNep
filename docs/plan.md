@@ -132,15 +132,15 @@ Show a successful create flow result and wait for approval.
 ## Phase 5 — History and Verification
 
 ### Tasks
-- [ ] Implement transfer history retrieval for the connected sender (query `getProgramAccounts` by sender field / filter on the PDA seed prefix; no backend DB).
-- [ ] Display transfer list + detail view: sender, recipient, amount, allocations, reference, status, signature, confirmation status, timestamp.
-- [ ] Recipient-side verification page: recipient pastes a settlement address or nonce and sees the compensating on-chain record.
-- [ ] Solana Explorer link using the Devnet cluster and the real signature.
-- [ ] Empty, pending, failed, and confirmed UI states throughout.
+- [x] Implement transfer history retrieval for the connected sender (query `getProgramAccounts` by sender field / filter on the PDA seed prefix; no backend DB).
+- [x] Display transfer list + detail view: sender, recipient, amount, allocations, reference, status, signature, confirmation status, timestamp.
+- [x] Recipient-side verification page: recipient pastes a settlement address or nonce and sees the compensating on-chain record.
+- [x] Solana Explorer link using the Devnet cluster and the real signature.
+- [x] Empty, pending, failed, and confirmed UI states throughout.
 
 ### Verify
-- `npm run typecheck`, `npm run lint`, `npm run build`.
-- Manual end-to-end: create → confirm → appears in history → recipient verifies.
+- [x] `npm run typecheck`, `npm run lint`, `npm run build`.
+- [x] End-to-end: create → confirm → appears in history → verified by address against a live local validator (`frontend/scripts/e2e-history.ts`); dev-server smoke test `/`, `/send`, `/history`, `/verify` all 200.
 
 ### Approval checkpoint
 Wait for approval.

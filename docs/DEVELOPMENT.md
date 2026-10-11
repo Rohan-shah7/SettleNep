@@ -270,11 +270,11 @@ Treat a transaction signature, account data, and transaction confirmation as dis
 
 ### Phase 5 — History and Verification
 
-- [ ] Retrieve relevant transfer records.
-- [ ] Display transfer and allocation details.
-- [ ] Implement recipient-side verification.
-- [ ] Add Solana Explorer links.
-- [ ] Handle empty, pending, failed, and confirmed states.
+- [x] Retrieve relevant transfer records.
+- [x] Display transfer and allocation details.
+- [x] Implement recipient-side verification.
+- [x] Add Solana Explorer links.
+- [x] Handle empty, pending, failed, and confirmed states.
 
 ### Phase 6 — Integration Testing
 
