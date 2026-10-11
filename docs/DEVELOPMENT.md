@@ -232,21 +232,21 @@ Treat a transaction signature, account data, and transaction confirmation as dis
 
 ### Phase 1 — Inspect and Plan
 
-- [ ] Inspect existing files and dependencies.
-- [ ] Verify the development toolchain.
-- [ ] Identify completed and missing functionality.
-- [ ] Finalize the architecture.
-- [ ] Propose the account model and transfer flow.
+- [x] Inspect existing files and dependencies.
+- [x] Verify the development toolchain.
+- [x] Identify completed and missing functionality.
+- [x] Finalize the architecture.
+- [x] Propose the account model and transfer flow.
 
 ### Phase 2 — Foundation
 
-- [ ] Configure the existing frontend.
-- [ ] Configure the existing Anchor workspace.
-- [ ] Establish a repeatable local testing workflow.
-- [ ] Configure Devnet.
-- [ ] Integrate wallet connection.
-- [ ] Add safe environment configuration.
-- [ ] Confirm the frontend and program build.
+- [x] Configure the existing frontend.
+- [x] Configure the existing Anchor workspace.
+- [x] Establish a repeatable local testing workflow.
+- [x] Configure Devnet.
+- [x] Integrate wallet connection.
+- [x] Add safe environment configuration.
+- [x] Confirm the frontend and program build.
 
 ### Phase 3 — Smart Contract
 

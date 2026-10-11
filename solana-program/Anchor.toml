@@ -9,7 +9,13 @@ skip-lint = false
 [programs.localnet]
 solana_program = "GFqpc53KGyUi1BGraoZxVCczM6iUCkRQdB8HfnBiH9RZ"
 
+[programs.devnet]
+solana_program = "GFqpc53KGyUi1BGraoZxVCczM6iUCkRQdB8HfnBiH9RZ"
+
 [provider]
+# Keep the provider on localnet so `anchor test` runs the LiteSVM cargo-test
+# suite locally. Deploy to Devnet explicitly with:
+#   anchor deploy --provider.cluster devnet
 cluster = "localnet"
 wallet = "~/.config/solana/id.json"
 
