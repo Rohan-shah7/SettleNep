@@ -11,6 +11,19 @@ GFqpc53KGyUi1BGraoZxVCczM6iUCkRQdB8HfnBiH9RZ
 > (gitignored). A verified backup lives outside the repo. Keep it secure — it is
 > also the upgrade authority for the deployed program.
 
+## Status (real, verifiable)
+
+- **Program: DEPLOYED and verified on Devnet.** `solana program show` → slot
+  510174157, data length 166,864 bytes, rent 0.8485 SOL, upgrade authority
+  `EkNJ…`. Deployed bytes SHA-256 `7db5f8f7…6157a1` = local build (byte-for-byte).
+- **Live Devnet transaction:** `42L7GwePFWL9xAAp6PCexQQM1NfvZSkE6z4P9bAaPxtv8AD2YjbMMJAJoGT1wBfaaVfxZJuNC9rJFQ174gy8NYHT`
+  ([Explorer](https://explorer.solana.com/tx/42L7GwePFWL9xAAp6PCexQQM1NfvZSkE6z4P9bAaPxtv8AD2YjbMMJAJoGT1wBfaaVfxZJuNC9rJFQ174gy8NYHT?cluster=devnet))
+  → `e2e-create` printed `RESULT: PASS`.
+- **Frontend `.env`:** set to Devnet (public RPC); `/history` unlocks once a
+  gPA-enabled RPC URL replaces `NEXT_PUBLIC_SOLANA_RPC_URL`.
+- **Remaining:** host on Vercel (steps in section 7), set Phantom to Devnet, run
+  the browser wallet demo, capture video.
+
 ---
 
 ## 0. Prerequisites

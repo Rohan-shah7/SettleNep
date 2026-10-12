@@ -167,12 +167,12 @@ Wait for approval.
 - [x] Full E2E on localnet: `e2e-create`, `e2e-history`, `e2e-errors` all `RESULT: PASS` against the genesis-loaded program; 4 frontend routes serve 200; `frontend/.env` = localnet + `http://127.0.0.1:8899` + canonical ID, frontend rebuilt.
 - [x] README updated: real implementation, local demo runbook, accurate status table, documented limitations.
 - [x] Deployment runbook written: [`docs/DEVNET-DEPLOY.md`](DEVNET-DEPLOY.md) (funding, deploy, on-chain integrity verification, Devnet E2E, `.env` swap, Vercel hosting); CI workflow added (`.github/workflows/ci.yml`); deploy keypair backed up outside the repo.
-- [ ] FUND deployment wallet on Devnet — blocked: devnet faucet was rate-limited / browser-captcha-only (target `~/.config/solana/id.json` = EkNJ...; needs ~1.7 SOL peak incl. temp buffer; rent-exempt min for the 166,864-byte program is 0.8486 SOL). Approx cost verified via `solana rent`, not assumed. Follow [`docs/DEVNET-DEPLOY.md`](DEVNET-DEPLOY.md).
-- [ ] Obtain gPA-enabled Devnet RPC URL (public `api.devnet.solana.com` disables `getProgramAccounts`, which `/history` needs).
-- [ ] `anchor deploy --provider.cluster devnet` + record real deployed program ID (must stay `GFq...`, check `solana program show`), quick Devnet E2E.
-- [ ] Swap frontend `.env` to Devnet (cluster, RPC URL) and rebuild; live Phantom/Solflare wallet demo (wallets cannot sign on localnet).
+- [x] FUND deployment wallet on Devnet (target `~/.config/solana/id.json` = EkNJ...): funded **2.5 SOL** (needs ~1.7 SOL peak incl. temp buffer; rent-exempt min for the 166,864-byte program is 0.8486 SOL).
+- [ ] Obtain gPA-enabled Devnet RPC URL (public `api.devnet.solana.com` disables `getProgramAccounts`, which `/history` needs) — pending operator-provided Helius/QuickNode URL.
+- [x] `anchor deploy --provider.cluster devnet`: **DEPLOYED** and verified — `solana program show` (slot 510174157, data length 166,864, rent 0.8485 SOL, upgrade authority = EkNJ...); on-chain integrity proven: `solana program dump` SHA-256 == local build `7db5f8f7…6157a1` (byte-for-byte). Devnet regex E2E `e2e-create` = `RESULT: PASS` (tx `42L7GwePFWL9xAAp6PCexQQM1NfvZSkE6z4P9bAaPxtv8AD2YjbMMJAJoGT1wBfaaVfxZJuNC9rJFQ174gy8NYHT`, settlement `2Jpg4iyKY1AUF6Pbg8zxci8Z2XQgR7qK7HiWju7C8VsE`).
+- [x] Swap frontend `.env` to Devnet (cluster=devnet, program ID canonical) and rebuild; 4 routes serve 200 with devnet baked into the bundle. Live Phantom wallet demo still pending (wallets cannot sign on localnet).
 - [ ] Capture screenshots and demo video once the Devnet wallet flow works.
-- [ ] Update root `README.md` with Devnet deployment results and real explorer-visible transactions.
+- [x] Update root `README.md` with Devnet deployment results and real explorer-visible transactions.
 
 ### Verify
 - Devnet end-to-end with a real explorer-visible transaction; confirm refunds/settlement visible.

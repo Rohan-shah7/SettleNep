@@ -147,7 +147,18 @@ Each script prints a `RESULT: PASS` after exercising send → confirm → histor
 
 ## 🚀 Deployment (Devnet)
 
-The program is deployed locally under a canonical ID (`GFqpc53KGyUi1BGraoZxVCczM6iUCkRQdB8HfnBiH9RZ`). The full step-by-step runbook (funding, deploy, integrity verification, Devnet E2E, `.env` swap, Vercel hosting) lives in **[`docs/DEVNET-DEPLOY.md`](docs/DEVNET-DEPLOY.md)**. Remaining work is entirely operator-side: fund the deploy wallet, provide a `getProgramAccounts`-enabled Devnet RPC URL, and run the runbook.
+**Status: LIVE on Solana Devnet** under the canonical ID:
+
+```
+GFqpc53KGyUi1BGraoZxVCczM6iUCkRQdB8HfnBiH9RZ
+```
+
+- Deployed via `anchor deploy --provider.cluster devnet`; upgrade authority is the deploy wallet (`EkNJ…`).
+- **On-chain integrity verified**: the dumped deployed bytes SHA-256 `7db5f8f7…6157a1`, byte-for-byte identical to the local build.
+- **Real Devnet transaction** (E2E create → `SETTLED`, allocations 0.007 + 0.003 SOL, recipient paid): [`42L7Gwe…NYHT`](https://explorer.solana.com/tx/42L7GwePFWL9xAAp6PCexQQM1NfvZSkE6z4P9bAaPxtv8AD2YjbMMJAJoGT1wBfaaVfxZJuNC9rJFQ174gy8NYHT?cluster=devnet).
+- Frontend `.env` is configured for Devnet. The full runbook (funding, deploy, verification, E2E, `.env` swap, **Vercel hosting steps**) lives in **[`docs/DEVNET-DEPLOY.md`](docs/DEVNET-DEPLOY.md)**.
+
+Note: `/history` on Devnet needs a `getProgramAccounts`-enabled RPC URL (public `api.devnet.solana.com` disables it). Until you set one in `frontend/.env` and on Vercel, Send + Verify work live; swap the RPC value to your Helius/QuickNode key to unlock History.
 
 ## ⚠️ Limitations (MVP)
 
@@ -168,7 +179,7 @@ The program is deployed locally under a canonical ID (`GFqpc53KGyUi1BGraoZxVCczM
 | End-to-end settlement flow | ✅ Implemented & E2E-verified on localnet |
 | Transaction history + verification | ✅ Implemented & E2E-verified on localnet |
 | Frontend quality gates | ✅ lint / typecheck / 52 unit tests / build |
-| Devnet deployment | 📘 Steps ready — see [`docs/DEVNET-DEPLOY.md`](docs/DEVNET-DEPLOY.md) |
+| Devnet deployment | ✅ Deployed & verified (SHA-256 match; live tx [`42L7Gwe…NYHT`](https://explorer.solana.com/tx/42L7GwePFWL9xAAp6PCexQQM1NfvZSkE6z4P9bAaPxtv8AD2YjbMMJAJoGT1wBfaaVfxZJuNC9rJFQ174gy8NYHT?cluster=devnet)) |
 | Demo video and screenshots | ⏳ Pending capture |
 
 ## 🔐 Security
