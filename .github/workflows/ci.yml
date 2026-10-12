@@ -35,11 +35,11 @@ jobs:
         run: CARGO_BUILD_JOBS=2 cargo install --locked --version 1.1.2 anchor-cli
 
       - name: Build program
-        run: NO_DNA=1 anchor build
+        run: CARGO_BUILD_JOBS=2 NO_DNA=1 anchor build
         working-directory: solana-program
 
       - name: Run Rust tests (LiteSVM, no validator required)
-        run: cargo test
+        run: CARGO_BUILD_JOBS=2 cargo test
         working-directory: solana-program
 
   frontend:
