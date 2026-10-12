@@ -19,12 +19,13 @@ GFqpc53KGyUi1BGraoZxVCczM6iUCkRQdB8HfnBiH9RZ
 - **Live Devnet transaction:** `42L7GwePFWL9xAAp6PCexQQM1NfvZSkE6z4P9bAaPxtv8AD2YjbMMJAJoGT1wBfaaVfxZJuNC9rJFQ174gy8NYHT`
   ([Explorer](https://explorer.solana.com/tx/42L7GwePFWL9xAAp6PCexQQM1NfvZSkE6z4P9bAaPxtv8AD2YjbMMJAJoGT1wBfaaVfxZJuNC9rJFQ174gy8NYHT?cluster=devnet))
   → `e2e-create` printed `RESULT: PASS`.
-- **Frontend `.env`:** set to Devnet (public RPC); `/history` unlocks once a
-  gPA-enabled RPC URL replaces `NEXT_PUBLIC_SOLANA_RPC_URL`.
+- **Frontend `.env`:** set to Devnet with a **gPA-enabled Helius RPC** (verified:
+  `e2e-create` and `e2e-history` both `RESULT: PASS` over it).
 - **Live web app:** https://settle-nep.vercel.app/ deployed on Vercel (all routes
-  serve 200, header hydration verified).
-- **Remaining:** (1) swap in a gPA-enabled RPC for `/history`, (2) Phantom →
-  Devnet browser wallet demo, (3) screenshots + demo video.
+  serve 200, header hydration verified). `/history` unlocks on the live site
+  once `NEXT_PUBLIC_SOLANA_RPC_URL` in Vercel is set to the Helius URL.
+- **Remaining:** (1) swap Vercel env var to the Helius URL + redeploy, (2)
+  Phantom → Devnet browser wallet demo, (3) screenshots + demo video.
 
 ---
 
