@@ -8,6 +8,8 @@ Instead of treating remittances as simple transfers, SettleNep explores how send
 
 Built with **Next.js, Rust, Anchor, and `@solana/kit`**, SettleNep is being developed for the Colosseum Crypto World’s Fair 2026 hackathon.
 
+[![CI](https://github.com/Rohan-shah7/SettleNep/actions/workflows/ci.yml/badge.svg)](https://github.com/Rohan-shah7/SettleNep/actions/workflows/ci.yml)
+
 ## 💡 The Idea
 
 Imagine someone living abroad wants to send $500 worth of supported digital assets to their family in Nepal.
@@ -59,7 +61,7 @@ SettleNep uses Solana to provide:
 | Smart contracts | Rust, Anchor 1.x |
 | Client generation | Codama (`@codama/cli`, renderers-js) |
 | Testing | Anchor/LiteSVM (Rust), Vitest (frontend), esbuild E2E scripts |
-| Development network | Local validator (`solana-test-validator`); Devnet pending |
+| Development/deploy network | Local validator (`solana-test-validator`); Devnet (see [`docs/DEVNET-DEPLOY.md`](docs/DEVNET-DEPLOY.md)) |
 
 SettleNep does not require a centralized backend or database — the chain is the source of truth.
 
@@ -143,17 +145,9 @@ npx esbuild scripts/e2e-errors.ts  --bundle --platform=node --format=cjs --alias
 
 Each script prints a `RESULT: PASS` after exercising send → confirm → history → verify against the running validator.
 
-## 🚀 Deployment (Devnet — pending faucet)
+## 🚀 Deployment (Devnet)
 
-The program is deployed locally under a canonical ID (`GFqpc53KGyUi1BGraoZxVCczM6iUCkRQdB8HfnBiH9RZ`). Devnet deployment is the remaining step:
-
-```bash
-cd solana-program
-anchor deploy --provider.cluster devnet
-solana program show GFqpc53KGyUi1BGraoZxVCczM6iUCkRQdB8HfnBiH9RZ --url https://api.devnet.solana.com
-```
-
-Expected upcoming work: fund the CLI wallet (`~/.config/solana/id.json`) with Devnet SOL, provide a `getProgramAccounts`-enabled Devnet RPC URL (the public endpoint disables it, which the History page needs), swap the frontend `.env` to Devnet, and rebuild.
+The program is deployed locally under a canonical ID (`GFqpc53KGyUi1BGraoZxVCczM6iUCkRQdB8HfnBiH9RZ`). The full step-by-step runbook (funding, deploy, integrity verification, Devnet E2E, `.env` swap, Vercel hosting) lives in **[`docs/DEVNET-DEPLOY.md`](docs/DEVNET-DEPLOY.md)**. Remaining work is entirely operator-side: fund the deploy wallet, provide a `getProgramAccounts`-enabled Devnet RPC URL, and run the runbook.
 
 ## ⚠️ Limitations (MVP)
 
@@ -174,7 +168,7 @@ Expected upcoming work: fund the CLI wallet (`~/.config/solana/id.json`) with De
 | End-to-end settlement flow | ✅ Implemented & E2E-verified on localnet |
 | Transaction history + verification | ✅ Implemented & E2E-verified on localnet |
 | Frontend quality gates | ✅ lint / typecheck / 52 unit tests / build |
-| Devnet deployment | ⏳ Pending faucet + dedicated RPC |
+| Devnet deployment | 📘 Steps ready — see [`docs/DEVNET-DEPLOY.md`](docs/DEVNET-DEPLOY.md) |
 | Demo video and screenshots | ⏳ Pending capture |
 
 ## 🔐 Security

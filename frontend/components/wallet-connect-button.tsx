@@ -8,7 +8,7 @@ import {
   WalletReadyGate,
 } from "@solana/kit-plugin-wallet/react";
 import { useClient } from "@solana/react";
-import { useState } from "react";
+import { useState, useSyncExternalStore } from "react";
 
 import type { AppClient } from "@/app/providers";
 import { explorerAddressUrl } from "@/lib/solana";
@@ -17,18 +17,35 @@ function truncate(address: string): string {
   return `${address.slice(0, 4)}…${address.slice(-4)}`;
 }
 
+const detectingFallback = (
+  <span className="rounded-full border border-black/[.08] px-4 py-2 text-sm text-zinc-500 dark:border-white/[.145] dark:text-zinc-400">
+    Detecting wallets…
+  </span>
+);
+
+function subscribe(): () => void {
+  return () => {};
+}
+
 export function WalletConnectButton() {
   const client = useClient<AppClient>();
 
+  // Wallet availability only exists in the browser. useSyncExternalStore makes
+  // the server and the hydration-time client render both use the server
+  // snapshot (false), so markup matches; the client flips to `true` once
+  // hydrated and the real wallet UI appears.
+  const isMounted = useSyncExternalStore(
+    subscribe,
+    () => true,
+    () => false,
+  );
+
+  if (!isMounted) {
+    return detectingFallback;
+  }
+
   return (
-    <WalletReadyGate
-      client={client}
-      fallback={
-        <span className="rounded-full border border-black/[.08] px-4 py-2 text-sm text-zinc-500 dark:border-white/[.145] dark:text-zinc-400">
-          Detecting wallets…
-        </span>
-      }
-    >
+    <WalletReadyGate client={client} fallback={detectingFallback}>
       <WalletControls />
     </WalletReadyGate>
   );
