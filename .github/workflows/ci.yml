@@ -24,9 +24,7 @@ jobs:
         uses: Swatinem/rust-cache@v2
 
       - name: Install Anchor CLI (pinned to project version)
-        uses: metaplex-foundation/action-install-anchor@v1.3.0
-        with:
-          channel: v1.1.2
+        run: cargo install --locked --version 1.1.2 anchor-cli
 
       - name: Build program
         run: NO_DNA=1 anchor build
