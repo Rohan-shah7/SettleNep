@@ -171,6 +171,7 @@ Wait for approval.
 - [ ] Obtain gPA-enabled Devnet RPC URL (public `api.devnet.solana.com` disables `getProgramAccounts`, which `/history` needs) — pending operator-provided Helius/QuickNode URL.
 - [x] `anchor deploy --provider.cluster devnet`: **DEPLOYED** and verified — `solana program show` (slot 510174157, data length 166,864, rent 0.8485 SOL, upgrade authority = EkNJ...); on-chain integrity proven: `solana program dump` SHA-256 == local build `7db5f8f7…6157a1` (byte-for-byte). Devnet regex E2E `e2e-create` = `RESULT: PASS` (tx `42L7GwePFWL9xAAp6PCexQQM1NfvZSkE6z4P9bAaPxtv8AD2YjbMMJAJoGT1wBfaaVfxZJuNC9rJFQ174gy8NYHT`, settlement `2Jpg4iyKY1AUF6Pbg8zxci8Z2XQgR7qK7HiWju7C8VsE`).
 - [x] Swap frontend `.env` to Devnet (cluster=devnet, program ID canonical) and rebuild; 4 routes serve 200 with devnet baked into the bundle. Live Phantom wallet demo still pending (wallets cannot sign on localnet).
+- [x] Public web app hosted on Vercel: https://settle-nep.vercel.app/ (all routes 200; header hydration fixed).
 - [ ] Capture screenshots and demo video once the Devnet wallet flow works.
 - [x] Update root `README.md` with Devnet deployment results and real explorer-visible transactions.
 

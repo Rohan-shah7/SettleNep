@@ -156,6 +156,7 @@ GFqpc53KGyUi1BGraoZxVCczM6iUCkRQdB8HfnBiH9RZ
 - Deployed via `anchor deploy --provider.cluster devnet`; upgrade authority is the deploy wallet (`EkNJ…`).
 - **On-chain integrity verified**: the dumped deployed bytes SHA-256 `7db5f8f7…6157a1`, byte-for-byte identical to the local build.
 - **Real Devnet transaction** (E2E create → `SETTLED`, allocations 0.007 + 0.003 SOL, recipient paid): [`42L7Gwe…NYHT`](https://explorer.solana.com/tx/42L7GwePFWL9xAAp6PCexQQM1NfvZSkE6z4P9bAaPxtv8AD2YjbMMJAJoGT1wBfaaVfxZJuNC9rJFQ174gy8NYHT?cluster=devnet).
+- **Live web app:** [https://settle-nep.vercel.app/](https://settle-nep.vercel.app/) (hosted on Vercel).
 - Frontend `.env` is configured for Devnet. The full runbook (funding, deploy, verification, E2E, `.env` swap, **Vercel hosting steps**) lives in **[`docs/DEVNET-DEPLOY.md`](docs/DEVNET-DEPLOY.md)**.
 
 Note: `/history` on Devnet needs a `getProgramAccounts`-enabled RPC URL (public `api.devnet.solana.com` disables it). Until you set one in `frontend/.env` and on Vercel, Send + Verify work live; swap the RPC value to your Helius/QuickNode key to unlock History.
@@ -180,6 +181,7 @@ Note: `/history` on Devnet needs a `getProgramAccounts`-enabled RPC URL (public 
 | Transaction history + verification | ✅ Implemented & E2E-verified on localnet |
 | Frontend quality gates | ✅ lint / typecheck / 52 unit tests / build |
 | Devnet deployment | ✅ Deployed & verified (SHA-256 match; live tx [`42L7Gwe…NYHT`](https://explorer.solana.com/tx/42L7GwePFWL9xAAp6PCexQQM1NfvZSkE6z4P9bAaPxtv8AD2YjbMMJAJoGT1wBfaaVfxZJuNC9rJFQ174gy8NYHT?cluster=devnet)) |
+| Live web app (Vercel) | ✅ [settle-nep.vercel.app](https://settle-nep.vercel.app/) — all routes 200 |
 | Demo video and screenshots | ⏳ Pending capture |
 
 ## 🔐 Security

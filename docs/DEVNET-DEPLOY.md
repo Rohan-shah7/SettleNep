@@ -21,8 +21,10 @@ GFqpc53KGyUi1BGraoZxVCczM6iUCkRQdB8HfnBiH9RZ
   → `e2e-create` printed `RESULT: PASS`.
 - **Frontend `.env`:** set to Devnet (public RPC); `/history` unlocks once a
   gPA-enabled RPC URL replaces `NEXT_PUBLIC_SOLANA_RPC_URL`.
-- **Remaining:** host on Vercel (steps in section 7), set Phantom to Devnet, run
-  the browser wallet demo, capture video.
+- **Live web app:** https://settle-nep.vercel.app/ deployed on Vercel (all routes
+  serve 200, header hydration verified).
+- **Remaining:** (1) swap in a gPA-enabled RPC for `/history`, (2) Phantom →
+  Devnet browser wallet demo, (3) screenshots + demo video.
 
 ---
 
