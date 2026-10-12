@@ -23,8 +23,14 @@ jobs:
       - name: Cache cargo
         uses: Swatinem/rust-cache@v2
 
+      - name: Cache Anchor CLI binary
+        uses: actions/cache@v4
+        with:
+          path: ~/.cargo/bin/anchor
+          key: anchor-cli-1.1.2
+
       - name: Install Anchor CLI (pinned to project version)
-        run: cargo install --locked --version 0.27.0 anchor-cli
+        run: cargo install --locked --version 1.1.2 anchor-cli
 
       - name: Build program
         run: NO_DNA=1 anchor build
@@ -47,7 +53,7 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          node-version: "24"
           cache: npm
           cache-dependency-path: frontend/package-lock.json
 
