@@ -30,20 +30,36 @@ jobs:
           key: anchor-cli-1.1.2
 
       - name: Install Anchor CLI (pinned to project version)
-        # Compile with limited parallelism: the anchor-cli dependency tree is
-        # large and the GitHub runner OOMs rustc at the default job count.
-        run: CARGO_BUILD_JOBS=2 cargo install --locked --version 1.1.2 anchor-cli
+        run: cargo install --locked --version 1.1.2 anchor-cli
+
+      - name: Restore deploy keypair (optional, from secret)
+        # anchor build hard-fails with "Program ID mismatch" if the deploy
+        # keypair under target/deploy is missing (it is gitignored). Decode it
+        # from the SETTLENEP_DEPLOY_KEY secret when configured; otherwise CI
+        # falls back to plain cargo build below.
+        run: |
+          if [ -n "$SETTLENEP_DEPLOY_KEY" ]; then
+            mkdir -p target/deploy
+            printf '%s' "$SETTLENEP_DEPLOY_KEY" | base64 -d > target/deploy/settlenep-keypair.json
+            echo "::notice title=Deploy keypair restored::base64 secret decoded to target/deploy/settlenep-keypair.json"
+          fi
+        working-directory: solana-program
+        env:
+          SETTLENEP_DEPLOY_KEY: ${{ secrets.SETTLENEP_DEPLOY_KEY }}
 
       - name: Build program
-        # Capture the tail of the build output into a workflow annotation so
-        # the real panic/error is readable via check annotations (temporary).
         run: |
           set +e
-          NO_DNA=1 CARGO_BUILD_JOBS=2 RUST_BACKTRACE=1 anchor build 2>&1 | tee /tmp/build.log
+          if [ -f target/deploy/settlenep-keypair.json ]; then
+            NO_DNA=1 CARGO_BUILD_JOBS=2 RUST_BACKTRACE=1 anchor build 2>&1 | tee /tmp/build.log
+          else
+            echo "::notice title=Anchor build skipped::deploy keypair absent in CI; verifying compilation with cargo build instead"
+            NO_DNA=1 cargo build 2>&1 | tee /tmp/build.log
+          fi
           ec=${PIPESTATUS[0]}
           if [ "$ec" -ne 0 ]; then
             msg=$(tail -12 /tmp/build.log | tr '\r\n' '  ')
-            echo "::error title=Program build failed::$msg"
+            echo "::error title=Build step failed::$msg"
           fi
           exit "$ec"
         working-directory: solana-program
