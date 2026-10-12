@@ -35,11 +35,29 @@ jobs:
         run: CARGO_BUILD_JOBS=2 cargo install --locked --version 1.1.2 anchor-cli
 
       - name: Build program
-        run: CARGO_BUILD_JOBS=2 NO_DNA=1 anchor build
+        # Capture the tail of the build output into a workflow annotation so
+        # the real panic/error is readable via check annotations (temporary).
+        run: |
+          set +e
+          NO_DNA=1 CARGO_BUILD_JOBS=2 RUST_BACKTRACE=1 anchor build 2>&1 | tee /tmp/build.log
+          ec=${PIPESTATUS[0]}
+          if [ "$ec" -ne 0 ]; then
+            msg=$(tail -12 /tmp/build.log | tr '\r\n' '  ')
+            echo "::error title=Program build failed::$msg"
+          fi
+          exit "$ec"
         working-directory: solana-program
 
       - name: Run Rust tests (LiteSVM, no validator required)
-        run: CARGO_BUILD_JOBS=2 cargo test
+        run: |
+          set +e
+          CARGO_BUILD_JOBS=2 cargo test 2>&1 | tee /tmp/test.log
+          ec=${PIPESTATUS[0]}
+          if [ "$ec" -ne 0 ]; then
+            msg=$(tail -12 /tmp/test.log | tr '\r\n' '  ')
+            echo "::error title=Rust tests failed::$msg"
+          fi
+          exit "$ec"
         working-directory: solana-program
 
   frontend:

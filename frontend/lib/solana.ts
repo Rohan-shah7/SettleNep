@@ -19,7 +19,11 @@ const CHAIN_BY_CLUSTER = {
 export const CHAIN = CHAIN_BY_CLUSTER[CLUSTER];
 
 const DEFAULT_RPC_BY_CLUSTER: Record<SolanaCluster, string> = {
-  devnet: "https://api.devnet.solana.com",
+  // Devnet default is a Helius RPC rather than the public endpoint: the public
+  // endpoint is frequently rate-limited/overloaded and caused "Could not reach
+  // the Solana RPC" errors when sending on the live site. The key is
+  // browser-visible and only authorized for read+write on Devnet.
+  devnet: "https://devnet.helius-rpc.com/?api-key=26ef2ad2-77a1-4322-9dd2-6e04f25859d0",
   testnet: "https://api.testnet.solana.com",
   localnet: "http://127.0.0.1:8899",
   "mainnet-beta": "https://api.mainnet-beta.solana.com",
