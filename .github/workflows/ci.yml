@@ -23,51 +23,32 @@ jobs:
       - name: Cache cargo
         uses: Swatinem/rust-cache@v2
 
-      - name: Cache Anchor CLI binary
+      - name: Cache Solana (Agave) toolchain
         uses: actions/cache@v4
         with:
-          path: ~/.cargo/bin/anchor
-          key: anchor-cli-1.1.2
+          path: |
+            ~/.local/share/solana/install
+            ~/.cache/solana
+          key: solana-cli-3.1.10
 
-      - name: Install Anchor CLI (pinned to project version)
-        run: cargo install --locked --version 1.1.2 anchor-cli
-
-      - name: Restore deploy keypair (optional, from secret)
-        # anchor build hard-fails with "Program ID mismatch" if the deploy
-        # keypair under target/deploy is missing (it is gitignored). Decode it
-        # from the SETTLENEP_DEPLOY_KEY secret when configured; otherwise CI
-        # falls back to plain cargo build below.
+      - name: Install Solana (Agave) CLI
+        # Provides cargo-build-sbf. Anchor is intentionally not used in CI:
+        # `anchor build` requires the gitignored deploy keypair (Program ID
+        # mismatch), whereas cargo-build-sbf compiles the same artifact without it.
         run: |
-          if [ -n "$SETTLENEP_DEPLOY_KEY" ]; then
-            mkdir -p target/deploy
-            printf '%s' "$SETTLENEP_DEPLOY_KEY" | base64 -d > target/deploy/settlenep-keypair.json
-            echo "::notice title=Deploy keypair restored::base64 secret decoded to target/deploy/settlenep-keypair.json"
-          fi
-        working-directory: solana-program
-        env:
-          SETTLENEP_DEPLOY_KEY: ${{ secrets.SETTLENEP_DEPLOY_KEY }}
+          sh -c "$(curl -sSfL https://release.anza.xyz/v3.1.10/install)"
+          echo "$HOME/.local/share/solana/install/active_release/bin" >> "$GITHUB_PATH"
 
-      - name: Build program
-        run: |
-          set +e
-          if [ -f target/deploy/settlenep-keypair.json ]; then
-            NO_DNA=1 CARGO_BUILD_JOBS=2 RUST_BACKTRACE=1 anchor build 2>&1 | tee /tmp/build.log
-          else
-            echo "::notice title=Anchor build skipped::deploy keypair absent in CI; verifying compilation with cargo build instead"
-            NO_DNA=1 cargo build 2>&1 | tee /tmp/build.log
-          fi
-          ec=${PIPESTATUS[0]}
-          if [ "$ec" -ne 0 ]; then
-            msg=$(tail -12 /tmp/build.log | tr '\r\n' '  ')
-            echo "::error title=Build step failed::$msg"
-          fi
-          exit "$ec"
-        working-directory: solana-program
+      - name: Build SBF program artifact
+        # The LiteSVM tests load target/deploy/settlenep.so at compile time
+        # (include_bytes!), so the SBF artifact must exist before `cargo test`.
+        run: cargo build-sbf --sbf-out-dir "$GITHUB_WORKSPACE/solana-program/target/deploy"
+        working-directory: solana-program/programs/settlenep
 
       - name: Run Rust tests (LiteSVM, no validator required)
         run: |
           set +e
-          CARGO_BUILD_JOBS=2 cargo test 2>&1 | tee /tmp/test.log
+          cargo test 2>&1 | tee /tmp/test.log
           ec=${PIPESTATUS[0]}
           if [ "$ec" -ne 0 ]; then
             msg=$(tail -12 /tmp/test.log | tr '\r\n' '  ')
