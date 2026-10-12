@@ -6,7 +6,7 @@ SettleNep is a blockchain-powered remittance prototype exploring how programmabl
 
 Instead of treating remittances as simple transfers, SettleNep explores how senders can define allocation rules for different purposes, such as family expenses, education, savings, and emergencies.
 
-Built with **Next.js, Rust, Anchor, and Solana**, SettleNep is being developed for the Colosseum Crypto World’s Fair 2026 hackathon.
+Built with **Next.js, Rust, Anchor, and `@solana/kit`**, SettleNep is being developed for the Colosseum Crypto World’s Fair 2026 hackathon.
 
 ## 💡 The Idea
 
@@ -24,43 +24,44 @@ They define the following allocation plan:
 
 SettleNep aims to make these allocation rules verifiable and associate them with on-chain settlement records.
 
-*Illustrative example only. Allocation records do not automatically restrict spending or distribute funds unless the implemented smart-contract logic explicitly supports those behaviors.*
+*Illustrative example only. Allocation records describe the intended split; they do not automatically restrict or distribute funds.*
 
 ## 🎯 The Problem
 
 Cross-border remittance processes can involve multiple intermediaries, fragmented reconciliation, and limited visibility into settlement status.
 
-SettleNep explores how Solana can provide:
+SettleNep uses Solana to provide:
 
-- Verifiable on-chain settlement records.
-- Programmable allocation rules.
-- Transparent transaction history.
-- Recipient-side transaction verification.
+- Verifiable on-chain settlement records (a `Settlement` PDA per transfer).
+- Programmable, on-chain-validated allocation rules (amounts must sum to the transfer).
+- Transparent transaction history for the connected sender.
+- Recipient-side verification, no wallet required.
 - A foundation for future integration with compliant remittance providers.
 
-## ✨ Planned MVP Features
+## ✅ Implemented
 
-- **Wallet connection:** Connect a supported Solana wallet.
-- **Remittance creation:** Enter a recipient address and transfer amount.
-- **Allocation planning:** Define and validate purpose-based allocations.
-- **On-chain settlement:** Execute a supported test-asset transfer through an Anchor program.
-- **Transaction verification:** Verify confirmed transactions and on-chain records.
-- **Transfer history:** View relevant transaction and allocation details.
-
-Features will be marked complete as they are implemented and tested.
+- **Anchor program** (`settlenep`, ID `GFqpc53KGyUi1BGraoZxVCczM6iUCkRQdB8HfnBiH9RZ`): creates a `Settlement` PDA carrying sender, recipient, amount, up to 8 purpose allocations, an optional 32-byte reference, timestamp, nonce, and status. Validates recipients, amounts, allocation totals, and rejects duplicate sender+nonce retries.
+- **Frontend** (`Next.js` App Router + `@solana/kit` 8, `@solana/react`, React 19, Tailwind v4):
+  - `/send` — recipient/amount/reference + allocation builder (live sum check), review step, wallet-backed send, confirmation, on-chain read-back.
+  - `/history` — the connected sender's settlements, fetched with `getProgramAccounts` (no backend DB), each with confirmation status and Explorer link.
+  - `/verify` — recipient/payer lookup by settlement address **or** sender + nonce (PDA re-derived), works without a wallet.
+  - Landing page with feature cards and navigation.
+- **Codama client** — TypeScript SDK generated from the Anchor IDL.
+- **Tests**: 11 Anchor/LiteSVM Rust tests; 52 Vitest unit tests (`npm test`); three E2E scripts exercising the full flow against a live validator via the real RPC client.
 
 ## 🛠️ Technology Stack
 
 | Component | Technology |
 |---|---|
-| Frontend | Next.js, TypeScript, Tailwind CSS |
-| Wallet integration | Compatible Solana wallet adapter |
+| Frontend | Next.js 16, TypeScript, Tailwind CSS 4 |
+| Client SDK | `@solana/kit` 8, `@solana/kit-plugin-rpc`, `@solana/kit-plugin-wallet`, `@solana/react` |
 | Blockchain | Solana |
-| Smart contracts | Rust, Anchor Framework |
-| Client integration | Compatible Solana and Anchor TypeScript libraries |
-| Development network | Solana Devnet |
+| Smart contracts | Rust, Anchor 1.x |
+| Client generation | Codama (`@codama/cli`, renderers-js) |
+| Testing | Anchor/LiteSVM (Rust), Vitest (frontend), esbuild E2E scripts |
+| Development network | Local validator (`solana-test-validator`); Devnet pending |
 
-SettleNep does not require a centralized Laravel backend or MySQL database for its initial MVP.
+SettleNep does not require a centralized backend or database — the chain is the source of truth.
 
 ## 🏗️ Architecture
 
@@ -68,115 +69,120 @@ SettleNep does not require a centralized Laravel backend or MySQL database for i
           Next.js Frontend
                   |
                   v
-           Solana Wallet
+            Solana Wallet
                   |
                   v
-       Anchor TypeScript Client
+        @solana/kit 8 Client
+        (Codama-generated)
                   |
                   v
-            Solana Devnet
+           Solana RPC
+       (localnet | devnet)
                   |
                   v
-        SettleNep Anchor Program
-             Rust / Anchor
+         SettleNep Anchor Program
+              Rust / Anchor
                   |
           +-------+-------+
           |               |
           v               v
-    Transfer State   Allocation Rules
+    Settlement State  Allocation Rules
           |
           v
      On-Chain Records
           |
           v
-    Transaction Verification
+ Transaction Verification
 ```
 
-## 🚀 Getting Started
+## 🚀 Local Demo
+
+Run the full flow on your machine — no Devnet SOL or faucet required (the local node has an unlimited faucet and the program is baked into genesis).
 
 ### Prerequisites
 
-- Node.js
-- npm or pnpm
-- Rust and Cargo
-- Solana CLI
-- Anchor CLI
-- A supported Solana wallet
+- Node.js ≥ 20, npm
+- Rust + Cargo, Solana CLI, Anchor CLI (versions compatible with the project pins)
 
-Install tool versions compatible with the existing project configuration.
-
-### Clone the Repository
+### 1. Start the validator with the program at genesis
 
 ```bash
-git clone https://github.com/Rohan-shah7/SettleNep.git
-cd SettleNep
+cd solana-program
+solana-test-validator --reset \
+  --bpf-program GFqpc53KGyUi1BGraoZxVCczM6iUCkRQdB8HfnBiH9RZ target/deploy/settlenep.so
 ```
 
-### Run the Frontend
+(Build the program first with `NO_DNA=1 anchor build` if `.so` is missing.)
 
-Follow the actual frontend directory and package manager used in the repository.
+### 2. Fund the demo sender (optional, only for the CLI scripts)
 
-If the frontend is located in `frontend/` and uses npm:
+```bash
+solana airdrop 10 --url http://127.0.0.1:8899
+```
+
+### 3. Run the frontend against localnet
 
 ```bash
 cd frontend
 npm install
+cp .env.example .env  # then set NEXT_PUBLIC_SOLANA_CLUSTER=localnet
 npm run dev
 ```
 
-Open `http://localhost:3000` in your browser.
+Open `http://localhost:3000`. The History page works without a wallet; Sending and sender History need a connected wallet. Note: Phantom/Solflare do not sign transactions on localnet (their networks are devnet/testnet) — the live wallet flow is demonstrated on Devnet (see Deployment below).
 
-### Build the Anchor Program
-
-Run these commands from the Anchor workspace root, where `Anchor.toml` is located:
+### 4. E2E proof (automated, no browser needed)
 
 ```bash
-anchor build
-anchor test
+cd frontend
+npm run typecheck && npm test
+npx esbuild scripts/e2e-create.ts --bundle --platform=node --format=cjs --alias:@=. --outfile=/tmp/e2e-create.cjs && node /tmp/e2e-create.cjs
+npx esbuild scripts/e2e-history.ts --bundle --platform=node --format=cjs --alias:@=. --outfile=/tmp/e2e-history.cjs && node /tmp/e2e-history.cjs
+npx esbuild scripts/e2e-errors.ts  --bundle --platform=node --format=cjs --alias:@=. --outfile=/tmp/e2e-errors.cjs  && node /tmp/e2e-errors.cjs
 ```
 
-The required validator and test configuration must be set up before running the tests.
+Each script prints a `RESULT: PASS` after exercising send → confirm → history → verify against the running validator.
 
-For detailed development instructions, see [`docs/DEVELOPMENT.md`](docs/DEVELOPMENT.md).
+## 🚀 Deployment (Devnet — pending faucet)
 
-## ⚠️ Prototype Notice
+The program is deployed locally under a canonical ID (`GFqpc53KGyUi1BGraoZxVCczM6iUCkRQdB8HfnBiH9RZ`). Devnet deployment is the remaining step:
 
-SettleNep is an experimental hackathon project intended for Solana Devnet and test assets.
+```bash
+cd solana-program
+anchor deploy --provider.cluster devnet
+solana program show GFqpc53KGyUi1BGraoZxVCczM6iUCkRQdB8HfnBiH9RZ --url https://api.devnet.solana.com
+```
 
-It does not currently provide real-money remittance processing, fiat conversion, or production financial services.
+Expected upcoming work: fund the CLI wallet (`~/.config/solana/id.json`) with Devnet SOL, provide a `getProgramAccounts`-enabled Devnet RPC URL (the public endpoint disables it, which the History page needs), swap the frontend `.env` to Devnet, and rebuild.
 
-Any future production deployment would require appropriate regulatory approvals, compliant settlement infrastructure, and suitable financial or remittance partners.
+## ⚠️ Limitations (MVP)
+
+- **SOL-only**: transfers move SOL tokens between Solana addresses.
+- **Allocation metadata only**: allocations document the intended split; they are not independently funded or restricted.
+- **Single status**: settlements are created as `Settled`; there is no cancel/refund/claim transition yet.
+- **History RPC dependency**: `/history` uses `getProgramAccounts`, which several public RPCs (including `api.devnet.solana.com`) disable — a gPA-enabled Devnet RPC is required for that page on Devnet.
+- **Wallet demo**: Phantom/Solflare do not sign against localnet; live wallet sending is demonstrated on Devnet.
+- For detailed development constraints, see [`docs/DEVELOPMENT.md`](docs/DEVELOPMENT.md).
 
 ## 📍 Project Status
 
-**Status: Under Development**
-
-The implementation status will be updated as features are completed and verified.
-
-- [ ] Wallet integration
-- [ ] Remittance and allocation interface
-- [ ] Anchor program implementation
-- [ ] On-chain transfer records
-- [ ] End-to-end settlement flow
-- [ ] Transaction history and verification
-- [ ] Devnet testing
-- [ ] Demo video and screenshots
-
-## 🗺️ Roadmap
-
-1. Inspect and finalize the project architecture.
-2. Establish the frontend and Anchor development environments.
-3. Implement the transfer and allocation model.
-4. Integrate the frontend with the Solana program.
-5. Test the complete settlement flow on Devnet.
-6. Prepare the hackathon demonstration and documentation.
+| Item | State |
+|---|---|
+| Anchor program (create settlement + validation) | ✅ Implemented & tested (11 Rust tests) |
+| Remittance + allocation interface | ✅ Implemented |
+| On-chain settlement records | ✅ Implemented |
+| End-to-end settlement flow | ✅ Implemented & E2E-verified on localnet |
+| Transaction history + verification | ✅ Implemented & E2E-verified on localnet |
+| Frontend quality gates | ✅ lint / typecheck / 52 unit tests / build |
+| Devnet deployment | ⏳ Pending faucet + dedicated RPC |
+| Demo video and screenshots | ⏳ Pending capture |
 
 ## 🔐 Security
 
-- Never commit private keys, seed phrases, or wallet keypairs.
+- Never commit private keys, seed phrases, or wallet keypairs — the deploy keypair at `solana-program/target/deploy/settlenep-keypair.json` is gitignored; back it up securely.
 - Never store sensitive personal information on-chain.
-- Validate instructions and account ownership in the Anchor program.
-- Verify confirmed transactions before displaying success.
+- The program validates recipients, amounts, and allocation totals and rejects duplicate sender+nonce attempts.
+- The frontend verifies confirmed transaction status before showing success.
 - Do not use mainnet or real funds during MVP development.
 
 ## 📄 License

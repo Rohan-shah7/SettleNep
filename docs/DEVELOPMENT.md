@@ -291,14 +291,17 @@ Treat a transaction signature, account data, and transaction confirmation as dis
 
 ### Phase 7 — Hackathon Demo
 
-- [ ] Deploy the verified program to Devnet.
-- [ ] Record the actual program ID.
-- [ ] Verify the deployment and test flow.
-- [ ] Configure the frontend for the deployed program.
-- [ ] Capture screenshots.
-- [ ] Record a demo video.
-- [ ] Update the public README.
-- [ ] Document remaining limitations.
+Local demo (done — no Devnet SOL needed):
+- [x] Start the validator with the program at genesis: `solana-test-validator --reset --bpf-program GFqpc53KGyUi1BGraoZxVCczM6iUCkRQdB8HfnBiH9RZ target/deploy/settlenep.so`.
+- [x] Local airdrop for the demo sender (unlimited on the local node); frontend `.env` = localnet; frontend rebuilt.
+- [x] Full E2E on localnet: `e2e-create`, `e2e-history`, `e2e-errors` PASS; `/`, `/send`, `/history`, `/verify` serve 200.
+- [x] Public README updated (implementation, local runbook, status, limitations).
+
+Deferred (blocked on Devnet faucet + dedicated RPC):
+- [ ] Fund `~/.config/solana/id.json` with Devnet SOL (~1.7 SOL peak; program rent-exempt minimum is 0.8486 SOL — do not overassign).
+- [ ] Obtain a `getProgramAccounts`-enabled Devnet RPC URL; add it to `frontend/.env` and use it for Devnet verification.
+- [ ] `anchor deploy --provider.cluster devnet`; confirm `solana program show` shows `GFq...`; run a quick Devnet E2E.
+- [ ] Rebuild the frontend for Devnet, connect a real wallet (Phantom/Solflare cannot sign on localnet), capture screenshots/video.
 
 ## 9. Agentic Development Rules
 

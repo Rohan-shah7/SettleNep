@@ -163,13 +163,15 @@ Wait for approval.
 ## Phase 7 — Hackathon Demo
 
 ### Tasks
-- [ ] Fund the deploy wallet on Devnet.
-- [ ] `anchor deploy --provider.cluster devnet`; record the real deployed program ID (must match `GFqpc53KGyUi1BGraoZxVCczM6iUCkRQdB8HfnBiH9RZ` or update everywhere: code, IDL, `.env.example`, Anchor.toml).
-- [ ] Verify deployment: `solana program show`, quick end-to-end flow on Devnet.
-- [ ] Point the frontend `.env` at Devnet + deployed program.
-- [ ] Capture screenshots and record a demo video of the verified flow.
-- [ ] Update the root `README.md` to match the real implementation.
-- [ ] Document remaining limitations (SOL-only, allocation metadata only, no spending restrictions).
+- [x] Local demo environment: `solana-test-validator --reset --bpf-program <ID> target/deploy/settlenep.so` (program baked into genesis, zero funding required); local airdrop for the demo sender (unlimited on the local node).
+- [x] Full E2E on localnet: `e2e-create`, `e2e-history`, `e2e-errors` all `RESULT: PASS` against the genesis-loaded program; 4 frontend routes serve 200; `frontend/.env` = localnet + `http://127.0.0.1:8899` + canonical ID, frontend rebuilt.
+- [x] README updated: real implementation, local demo runbook, accurate status table, documented limitations.
+- [ ] FUND deployment wallet on Devnet — blocked: devnet faucet was rate-limited / browser-captcha-only (target `~/.config/solana/id.json` = EkNJ...; needs ~1.7 SOL peak incl. temp buffer; rent-exempt min for the 166,864-byte program is 0.8486 SOL). Approx cost verified via `solana rent`, not assumed.
+- [ ] Obtain gPA-enabled Devnet RPC URL (public `api.devnet.solana.com` disables `getProgramAccounts`, which `/history` needs).
+- [ ] `anchor deploy --provider.cluster devnet` + record real deployed program ID (must stay `GFq...`, check `solana program show`), quick Devnet E2E.
+- [ ] Swap frontend `.env` to Devnet (cluster, RPC URL) and rebuild; live Phantom/Solflare wallet demo (wallets cannot sign on localnet).
+- [ ] Capture screenshots and demo video once the Devnet wallet flow works.
+- [ ] Update root `README.md` with Devnet deployment results and real explorer-visible transactions.
 
 ### Verify
 - Devnet end-to-end with a real explorer-visible transaction; confirm refunds/settlement visible.
